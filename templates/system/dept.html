@@ -1,0 +1,41 @@
+{% extends 'tpl/template.html' %}
+
+{% block main %}
+    <div class="layui-card">
+        <div class="layui-card-header">组织架构</div>
+        <div class="layui-card-body">
+            <div id="toolbar">
+                <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </div>
+            <table id="dept" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}">
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script>
+        layui.use(['element', 'jquery', 'table'], function () {
+            var $ = layui.$,
+                element = layui.element,
+                table = layui.table;
+            //第一个实例
+            table.render({
+                id: 'dept'
+                , elem: '#dept'
+                , url: '/system/dept/list' //数据接口
+                , page: true //开启分页
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'id', title: 'ID', sort: true}
+                    , {field: 'name', title: '部门名称',}
+                    , {field: 'type', title: '类型', sort: true}
+                    , {field: 'parent__name', title: '父部门'}
+                    , {fixed: 'right', align: 'center', toolbar: '#toolbar'}
+                ]]
+                , page: true
+            });
+        });
+    </script>
+{% endblock %}
