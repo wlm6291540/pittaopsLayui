@@ -15,7 +15,6 @@
         layui.use(['element', 'jquery', 'table', 'form'], function () {
             var $ = layui.$,
                 element = layui.element,
-                form = layui.form,
                 table = layui.table;
             //第一个实例
             table.render({
@@ -90,7 +89,6 @@
                 var data = obj.data;
                 var layEvent = obj.event;
                 var tr = obj.tr;
-                data = '?id='+ data.id + '&name='+data.name+ '&parent=' + data.parent
                 switch (obj.event) {
                     case 'delete':
                         layer.confirm('真的删除行么', function (index) {
@@ -107,12 +105,14 @@
                             type: 2,
                             content: "{% static 'module/forms/addDeptForm.html' %}",
                             success: function (layero, index) {
-                                console.log(form.val('deptForm'))
-                                layui.form.val('deptForm', {
-                                    'parent': data.parent,
-                                    'name': data.name,
-                                    'type': data.type
-                                })
+                                let body = layer.getChildFrame('body', index);
+                                body.find('#name').val(data.name)
+                                console.log($($(body.find('#type')).next())[0].val());
+                                if(data.type == 'unit') {
+                                    $(body.find('#type')).next().val('单位')
+                                }else{
+                                    $(body.find('#type')).next().val('部门')
+                                }
                                 layui.form.render();
                             }
                         });
