@@ -1,7 +1,7 @@
 from django.urls import path
 
 from system.views_dept import (
-    DepartmentMainView, DepartmentListView
+    DepartmentMainView, DepartmentListView, DepartmentTreeView, DepartmentCreateView, DepartmentDeleteView
 )
 
 from system.views_user import (
@@ -21,7 +21,10 @@ system_urls = []
 # 部门url
 dept_url = [
     path('system/dept', DepartmentMainView.as_view(), name='dept main'),
-    path('system/dept/list', DepartmentListView.as_view(), name='dept list')
+    path('system/dept/list', DepartmentListView.as_view(), name='dept list'),
+    path('system/dept/tree', DepartmentTreeView.as_view(), name='dept tree'),
+    path('system/dept/create', DepartmentCreateView.as_view(), name='dept create'),
+    path('system/dept/delete', DepartmentDeleteView.as_view(), name='dept delete')
 ]
 
 # 角色url

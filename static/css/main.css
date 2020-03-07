@@ -1,11 +1,14 @@
 .layui-body {
     width: inherit;
-    padding: 15px;
+}
+
+iframe {
+    border: none;
 }
 
 #main {
     width: 100%;
-    height: calc(100% - 104px);
+    height: calc(100% - 3px);
     border: none;
 }
 
