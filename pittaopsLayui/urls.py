@@ -20,6 +20,7 @@ from system.urls import system_urls
 from system.views import MainPageView
 
 urlpatterns = [
+    path('', MainPageView.as_view(), name='main page'),
     path('index', MainPageView.as_view(), name='index page')
 ]
 

@@ -21,6 +21,7 @@
 <body>
 <div class="layui-container">
     <form class="layui-form">
+        <input type="hidden" name="id" id="id">
         <div class="layui-form-item">
             <label class="layui-form-label">上级部门</label>
             <div class="layui-input-block">
@@ -56,13 +57,26 @@
 
 
 <script>
-    console.log(parent.layer.data)
     layui.use(['treeSelect', 'form', 'layer', 'table'], function () {
         var treeSelect = layui.treeSelect,
             form = layui.form,
             $ = layui.jquery,
+            router = layui.router(),
             table = layui.table,
+            dept = layui.data('edept').data,
             layer = layui.layer;
+        var placeholder = '请选择'
+        $('#id').attr('value', dept.id);
+        if (dept.parent != null){
+            placeholder = dept.parent__name;
+            $('#parent').attr('value', dept.parent);
+        }
+        $('#name').attr('value', dept.name);
+        if (dept.type == "部门"){
+            $($('#type option')[0]).attr('selected',  false);
+            $($('#type option')[1]).attr('selected',  true);
+            $('#type').next().find('input').attr('value', dept.type);
+        }
         treeSelect.render({
             // 选择器
             elem: '#parent',
@@ -73,7 +87,7 @@
             // 异步加载方式：get/post，默认get
             type: 'get',
             // 占位符
-            placeholder: '请选择',
+            placeholder: placeholder,
             //手风琴
             accordion: true,
             //无连线
@@ -91,9 +105,9 @@
 
         form.on('submit(add)', function (data) {
             $.ajax({
-                url: '/system/dept/create',
+                url: '/system/dept/update',
                 method: 'post',
-                data: data.field,
+                data: JSON.stringify(data.field),
                 dataType: 'json',
                 async: false,
                 success: function (data) {

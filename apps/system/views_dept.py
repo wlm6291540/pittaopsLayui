@@ -1,10 +1,13 @@
 import json
 
+from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView, View
 
-from system.models import Department
+
+from system.models import Department, User
+
 
 # Create your views here.
 
@@ -91,6 +94,44 @@ class DepartmentCreateView(View):
         return HttpResponse(json.dumps(ret), content_type="application/json")
 
 
+class DepartmentUpdateView(View):
+    def post(self, request):
+        code = 0
+        msg = "修改成功"
+        data = json.loads(request.body)
+        try:
+            dept = Department.objects.get(id=int(data['id']))
+            dept.type = data['type']
+            dept.name = data['name']
+            if dept:
+                if data['parent'] is None and data['type'] == 'unit':
+                    dept.save()
+                elif (data['parent'] is None or len(data['parent']) < 1) and data['type'] != 'unit':
+                    code = 1
+                    msg = "不能创建没有上级单位的部门"
+                elif data['parent'] and data['type'] == 'unit':
+                    code = 1
+                    msg = "不能创建有上级部门的单位"
+                else:
+                    pdept = None
+                    if len(data['parent']) > 0:
+                        pdept = Department.objects.get(id=data['parent'])
+                    if len(Department.objects.filter(name=data['name'], type=data['type'], parent=pdept).all()) < 1:
+                        dept.parent = pdept
+                        dept.save()
+                    else:
+                        code = 1
+                        message = "存在同名的部门"
+            else:
+                code = 1
+                msg = '不能存在该部门'
+        except ValueError as e:
+            code = 1
+            msg = "系统内部错误"
+        ret = dict(code=code, msg=msg)
+        return HttpResponse(json.dumps(ret), content_type="application/json")
+
+
 class DepartmentDeleteView(View):
     def post(self, request):
         code = 0
@@ -106,3 +147,45 @@ class DepartmentDeleteView(View):
             message = "删除失败"
         ret = dict(code=code, msg=message)
         return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class DepartmentBindUserView(View):
+    def get(self, request):
+        code, msg = 0, '用户获取成功'
+        data = None
+        try:
+            deptid = request.GET.get('deptid', None)
+            indept = request.GET.get('indept', None)
+            fields = ['id', 'username', 'nickname']
+            if deptid is not None and indept is not None:
+                dept = Department.objects.get(id=int(deptid))
+                if indept == 'false':
+                    data = list(User.objects.values(*fields).filter(~Q(department=dept)).all())
+                elif indept == 'true':
+                    data = list(User.objects.values(*fields).filter(department=dept).all())
+            else:
+                data = list(User.objects.values(*fields).all())
+        except Department.DoesNotExist as e:
+            print(e)
+            code, msg = 1, 'id 为{}的部门不存在'.format(deptid)
+        ret = dict(code=code, msg=msg, data=data)
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
+    def post(self, request):
+        code, msg = 0, '部门关联成功'
+        try:
+            ids = json.loads(request.POST.get('ids'))
+            deptid = request.POST.get('deptid')
+            deptid = int(deptid)
+            if ids and deptid:
+                dept = Department.objects.get(id=deptid)
+                User.objects.filter(id__in=ids).update(department=dept)
+            elif len(ids) <= 0 and deptid:
+                dept = Department.objects.get(id=deptid)
+                User.objects.filter(department=dept).update(department=None)
+        except Department.DoesNotExist as e:
+            print(e)
+            code, msg = 1, '系统内部错误'
+        ret = dict(code=code, msg=msg)
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
