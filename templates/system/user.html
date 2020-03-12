@@ -25,24 +25,49 @@
                 , url: '/system/user/list' //数据接口
                 , page: true //开启分页
                 , limit: 10
+                , loading: true
                 , cols: [[ //表头
                     {type: 'checkbox'}
                     , {field: 'id', title: 'ID', sort: true}
                     , {field: 'username', title: '用户名', sort: true}
-                    , {field: 'nickname', title: '昵称', }
-                    , {field: 'post', title: '职位'}
+                    , {field: 'nickname', title: '昵称',}
+                    , {field: 'post', title: '职位', templet: '#postStyle'}
                     , {field: 'superior', title: '主管'}
                     , {field: 'department__name', title: '部门'}
+                    , {field: 'email', title: '邮箱'}
+                    , {field: 'avatar', title: '头像'}
+                    , {field: 'is_active', title: '状态', templet: '#statusStyle'}
                     , {title: '操作', fixed: 'right', align: 'center', toolbar: '#toolbar'}
                 ]]
-                , page: true
             });
 
             function deleteDepts(ids, index) {
                 $.ajax({
-                    url: '/system/dept/delete',
+                    url: '/system/user/delete',
                     method: 'post',
                     data: {'ids': JSON.stringify(ids)},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg);
+                            layer.close(index);
+                            table.reload('dept');
+                        } else {
+                            layer.msg(data.msg)
+                        }
+                    },
+                    error: function () {
+                        layer.msg('系统内部错误')
+                        layer.close(index)
+                    }
+                })
+            }
+
+            function activeDepts(ids, status, index) {
+                $.ajax({
+                    url: '/system/user/active',
+                    method: 'post',
+                    data: {'ids': JSON.stringify(ids), 'status': status},
                     dataType: 'json',
                     success: function (data) {
                         if (data.code == 0) {
@@ -67,10 +92,10 @@
                         var data = checkStatus.data;
                         layer.open({
                             id: 'addDept',
-                            title: '添加部门',
-                            area: ['400px', '310px'],
+                            title: '添加用户',
+                            area: ['800px', '420px'],
                             type: 2,
-                            content: "{% static 'module/forms/addDeptForm.html' %}",
+                            content: "{% static 'module/forms/user/addUserForm.html' %}",
                         });
                         break;
                     case 'deleteDept':
@@ -82,6 +107,30 @@
                         layer.confirm('确认删除?', function (index) {
                             if (index = layer.index) {
                                 deleteDepts(ids, index)
+                            }
+                        })
+                        break;
+                    case 'activeDept':
+                        var data = checkStatus.data;
+                        var ids = []
+                        $(data).each(function (index, item) {
+                            ids.push(item.id)
+                        })
+                        layer.confirm('确认启用?', function (index) {
+                            if (index = layer.index) {
+                                activeDepts(ids, true, index)
+                            }
+                        })
+                        break;
+                    case 'banDept':
+                        var data = checkStatus.data;
+                        var ids = []
+                        $(data).each(function (index, item) {
+                            ids.push(item.id)
+                        })
+                        layer.confirm('确认禁用?', function (index) {
+                            if (index = layer.index) {
+                                activeDepts(ids, false, index)
                             }
                         })
                         break;
@@ -101,23 +150,13 @@
                         });
                         break;
                     case 'edit':
-                        layui.data('edept', {'key': 'data', 'value': data})
+                        layui.data('euser', {'key': 'user', 'value': data})
                         layer.open({
                             id: 'addDept',
-                            title: '修改部门',
-                            area: ['400px', '310px'],
+                            title: '编辑用户',
+                            area: ['800px', '420px'],
                             type: 2,
-                            content: "{% static 'module/forms/editDeptForm.html' %}"
-                        });
-                        break;
-                    case 'relate':
-                        layui.data('ruser', {'key': 'user', 'value': data})
-                        layer.open({
-                            id: 'relateDept',
-                            title: '关联用户',
-                            area: ['510px', '510px'],
-                            type: 2,
-                            content: "{% static 'module/forms/relateDept.html' %}"
+                            content: "{% static 'module/forms/user/editUserForm.html' %}"
                         });
                         break;
                 }
@@ -125,15 +164,36 @@
         });
     </script>
 
+
+    <script type="text/html" id="statusStyle">
+        {% verbatim %}
+        {{#  if(d.is_active == true){ }}
+        <span style="color: #5FB878;">启用</span>
+        {{#  } else { }}
+        <span style="color: #FFB800;">禁用</span>
+        {{#  } }}
+        {% endverbatim %}
+    </script>
+
+    <script type="text/html" id="postStyle">
+        {% verbatim %}
+        {{#  if(d.post == 0){ }}
+        <span>主管</span>
+        {{#  } else if(d.post == 1) { }}
+        <span>运维</span>
+        {{#  } else if(d.post == 2) { }}
+        <span>测试</span>
+        {{#  } else if(d.post == 3) { }}
+        <span>开发</span>
+        {{#  } }}
+        {% endverbatim %}
+    </script>
     <script type="text/html" id="toolbar">
         <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">
             <i class="layui-icon layui-icon-edit"></i>编辑
         </a>
-        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="delete">
+        <a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-danger" lay-event="delete">
             <i class="layui-icon layui-icon-delete"></i>删除
-        </a>
-        <a class="layui-btn layui-btn-radius layui-btn-danger layui-btn-xs" lay-event="relate">
-            <i class="layui-icon layui-icon-group"></i>关联
         </a>
     </script>
 
@@ -142,8 +202,14 @@
             <button type="button" class="layui-btn layui-btn-sm" lay-event="addDept">
                 <i class="layui-icon">&#xe654; 添加用户</i>
             </button>
-            <button type="button" class="layui-btn layui-btn-sm" lay-event="deleteDept">
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteDept">
                 <i class="layui-icon">&#xe640; 批量删除</i>
+            </button>
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="activeDept">
+                <i class="layui-icon">&#x1005; 启用</i>
+            </button>
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-warm" lay-event="banDept">
+                <i class="layui-icon">&#x1007; 禁用</i>
             </button>
         </div>
     </script>

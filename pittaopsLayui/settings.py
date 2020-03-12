@@ -86,7 +86,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'wlm@6291540',
         'CHARSET': 'utf8mb4',
-        'CONN_MAX_AGE': 30
+        'CONN_MAX_AGE': 300
     }
 }
 
@@ -147,6 +147,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')  #图片存取的绝对路径
+MEDIA_URL = '/media/'  #图片存取的相对路径
 
 AUTH_USER_MODEL = 'system.User'
 

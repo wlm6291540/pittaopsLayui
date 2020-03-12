@@ -5,11 +5,11 @@ from django.db import models
 
 
 class User(AbstractUser):
-    nickname = models.CharField(max_length=32, blank=False, null=True, verbose_name="昵称")
-    avatar = models.ImageField(upload_to="./media/system", verbose_name="头像")
-    roles = models.ForeignKey('Role', on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="角色")
+    post_choices = (('0', '主管'), ('1', '运维'), ('2', '测试'), ('3', '开发'))
+    nickname = models.CharField(max_length=32, blank=True, null=True, verbose_name="昵称")
+    avatar = models.CharField(max_length=32, null=True, blank=True, verbose_name="头像")
     department = models.ForeignKey("Department", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="部门")
-    post = models.CharField(max_length=50, null=True, blank=True, verbose_name="职位")
+    post = models.CharField(max_length=50, null=True, blank=True, choices=post_choices, verbose_name="职位")
     superior = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="上级主管")
     roles = models.ManyToManyField("Role", verbose_name="角色", blank=True)
 
