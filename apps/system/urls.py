@@ -13,7 +13,7 @@ from system.view_perm import (
     PermissionMainView)
 
 from system.views_role import (
-    RoleMainView)
+    RoleMainView, RoleCreateView, RoleListView, RoleDeleteView, RoleUpdateView, RoleBindUserView)
 
 system_urls = []
 
@@ -25,12 +25,18 @@ dept_url = [
     path('system/dept/create', DepartmentCreateView.as_view(), name='dept create'),
     path('system/dept/delete', DepartmentDeleteView.as_view(), name='dept delete'),
     path('system/dept/update', DepartmentUpdateView.as_view(), name='dept update'),
-    path('system/dept/binduser', DepartmentBindUserView.as_view(), name='dept bind user')
+path('system/dept/binduser', DepartmentBindUserView.as_view(), name='dept bind user')
 ]
 
 # 角色url
 role_url = [
-    path('system/role', RoleMainView.as_view(), name='role main')
+    path('system/role', RoleMainView.as_view(), name='role main'),
+    path('system/role/list', RoleListView.as_view(), name='role list'),
+    path('system/role/create', RoleCreateView.as_view(), name='role create'),
+    path('system/role/delete', RoleDeleteView.as_view(), name='role delete'),
+    path('system/role/update', RoleUpdateView.as_view(), name='role update'),
+    # path('system/user/active', UserActiveView.as_view(), name='user active'),
+    path('system/role/binduser', RoleBindUserView.as_view(), name='role bind user')
 ]
 
 # 用户url

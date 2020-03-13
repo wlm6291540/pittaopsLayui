@@ -11,7 +11,7 @@ class User(AbstractUser):
     department = models.ForeignKey("Department", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="部门")
     post = models.CharField(max_length=50, null=True, blank=True, choices=post_choices, verbose_name="职位")
     superior = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="上级主管")
-    roles = models.ManyToManyField("Role", verbose_name="角色", blank=True)
+    role = models.ManyToManyField("Role", verbose_name="角色", blank=True)
 
     class Meta:
         verbose_name = "用户"
@@ -46,7 +46,7 @@ class Role(models.Model):
     角色: 用于权限绑定
     """
     name = models.CharField(max_length=30, unique=True, verbose_name="角色")
-    permissions = models.ForeignKey("Menu", on_delete=models.DO_NOTHING, blank=True, verbose_name="url权限")
+    permissions = models.ManyToManyField("Menu", blank=True, verbose_name="URL授权")
     desc = models.CharField(max_length=50, blank=True, null=True, verbose_name="描述")
 
 

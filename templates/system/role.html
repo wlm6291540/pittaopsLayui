@@ -5,7 +5,7 @@
     <div class="layui-card">
         <div class="layui-card-header">角色管理</div>
         <div class="layui-card-body">
-            <table id="dept" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}" lay-filter="dept">
+            <table id="role" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}" lay-filter="role">
             </table>
         </div>
     </div>
@@ -19,18 +19,17 @@
                 table = layui.table;
             //第一个实例
             table.render({
-                id: 'dept'
-                , elem: '#dept'
+                id: 'role'
+                , elem: '#role'
                 , toolbar: '#topbar'
-                , url: '/system/dept/list' //数据接口
+                , url: '/system/role/list' //数据接口
                 , page: true //开启分页
                 , limit: 10
                 , cols: [[ //表头
                     {type: 'checkbox'}
                     , {field: 'id', title: 'ID', sort: true}
                     , {field: 'name', title: '部门名称',}
-                    , {field: 'type', title: '类型', sort: true}
-                    , {field: 'parent__name', title: '父部门'}
+                    , {field: 'desc', title: '备注',}
                     , {title: '操作', fixed: 'right', align: 'center', toolbar: '#toolbar'}
                 ]]
                 , page: true
@@ -38,7 +37,7 @@
 
             function deleteDepts(ids, index) {
                 $.ajax({
-                    url: '/system/dept/delete',
+                    url: '/system/role/delete',
                     method: 'post',
                     data: {'ids': JSON.stringify(ids)},
                     dataType: 'json',
@@ -46,7 +45,7 @@
                         if (data.code == 0) {
                             layer.msg(data.msg);
                             layer.close(index);
-                            table.reload('dept');
+                            table.reload('role');
                         } else {
                             layer.msg(data.msg)
                         }
@@ -58,20 +57,20 @@
                 })
             }
 
-            table.on('toolbar(dept)', function (obj) {
+            table.on('toolbar(role)', function (obj) {
                 var checkStatus = table.checkStatus(obj.config.id);
                 switch (obj.event) {
-                    case 'addDept':
+                    case 'addRole':
                         var data = checkStatus.data;
                         layer.open({
-                            id: 'addDept',
+                            id: 'addRole',
                             title: '添加部门',
-                            area: ['400px', '310px'],
+                            area: ['400px', '240px'],
                             type: 2,
-                            content: "{% static 'module/forms/addDeptForm.html' %}",
+                            content: "{% static 'module/forms/role/addRoleForm.html' %}",
                         });
                         break;
-                    case 'deleteDept':
+                    case 'deleteRole':
                         var data = checkStatus.data;
                         var ids = []
                         $(data).each(function (index, item) {
@@ -86,7 +85,7 @@
                 }
             });
 
-            table.on('tool(dept)', function (obj) {
+            table.on('tool(role)', function (obj) {
                 var data = obj.data;
                 var layEvent = obj.event;
                 var tr = obj.tr;
@@ -99,23 +98,33 @@
                         });
                         break;
                     case 'edit':
-                        layui.data('edept', {'key': 'data', 'value': data})
+                        layui.data('role', {'key': 'role', 'value': data})
                         layer.open({
-                            id: 'addDept',
-                            title: '修改部门',
+                            id: 'editRole',
+                            title: '修改角色',
                             area: ['400px', '310px'],
                             type: 2,
-                            content: "{% static 'module/forms/editDeptForm.html' %}"
+                            content: "{% static 'module/forms/role/editRoleForm.html' %}"
                         });
                         break;
                     case 'relate':
-                        layui.data('ruser', {'key': 'user', 'value': data})
+                        layui.data('role', {'key': 'role', 'value': data})
                         layer.open({
                             id: 'relateDept',
                             title: '关联用户',
                             area: ['510px', '510px'],
                             type: 2,
-                            content: "{% static 'module/forms/relateDept.html' %}"
+                            content: "{% static 'module/forms/role/relateRole.html' %}"
+                        });
+                        break;
+                    case 'auth':
+                        layui.data('role', {'key': 'role', 'value': data})
+                        layer.open({
+                            id: 'authMenu',
+                            title: '授权',
+                            area: ['620px', '510px'],
+                            type: 2,
+                            content: "{% static 'module/forms/role/roleAuthMenu.html' %}"
                         });
                         break;
                 }
@@ -124,23 +133,26 @@
     </script>
 
     <script type="text/html" id="toolbar">
-        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">
             <i class="layui-icon layui-icon-edit"></i>编辑
         </a>
-        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="delete">
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">
             <i class="layui-icon layui-icon-delete"></i>删除
         </a>
-        <a class="layui-btn layui-btn-radius layui-btn-danger layui-btn-xs" lay-event="relate">
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="relate">
             <i class="layui-icon layui-icon-group"></i>关联
+        </a>
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="auth">
+            <i class="layui-icon layui-icon-auz"></i>授权
         </a>
     </script>
 
     <script type="text/html" id="topbar">
         <div class="layui-btn-container">
-            <button type="button" class="layui-btn layui-btn-sm" lay-event="addDept">
-                <i class="layui-icon">&#xe654; 添加部门</i>
+            <button type="button" class="layui-btn layui-btn-sm" lay-event="addRole">
+                <i class="layui-icon">&#xe654; 添加角色</i>
             </button>
-            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteDept">
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteRole">
                 <i class="layui-icon">&#xe640; 批量删除</i>
             </button>
         </div>

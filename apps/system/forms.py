@@ -3,7 +3,7 @@ import re
 from django.contrib.auth import get_user_model
 from django import forms
 
-from system.models import Menu
+from system.models import Menu, Role
 
 User = get_user_model()
 
@@ -66,4 +66,16 @@ class MenuUpdateForm(forms.ModelForm):
 
         error_messages = {
             "name": {"required": "菜单名不能为空", 'unique': '菜单名重复'},
+        }
+
+
+class RoleForm(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = [
+            'id', 'name', 'desc'
+        ]
+
+        error_messages = {
+            "name": {"required": "角色名不能为空", 'unique': '角色名重复'},
         }

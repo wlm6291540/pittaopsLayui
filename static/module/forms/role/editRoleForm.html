@@ -20,42 +20,21 @@
 </head>
 <body>
 <div class="layui-container">
-    <form class="layui-form" lay-filter="userForm" enctype="multipart/form-data" method="post">
+    <form class="layui-form" lay-filter="roleForm" method="post">
+        <input type="hidden" id="id" name="id">
         <div class="layui-form-item">
-            <label class="layui-form-label">父菜单</label>
-            <div class="layui-input-inline">
-                <input type="text" id="parent" name="parent" lay-filter="parent" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">标题</label>
+            <label class="layui-form-label">名称</label>
             <div class="layui-input-inline">
                 <input type="text" name="name" id="name" lay-verify="required|name" placeholder="请输入"
                        autocomplete="off" class="layui-input">
             </div>
 
-            <label class="layui-form-label">代码</label>
+            <label class="layui-form-label">备注</label>
             <div class="layui-input-inline">
-                <input type="text" name="code" id="code" lay-verify="required" placeholder="请输入"
+                <input type="text" name="desc" id="desc" placeholder="请输入"
                        autocomplete="off" class="layui-input">
             </div>
         </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label">url</label>
-            <div class="layui-input-inline">
-                <input type="text" name="url" id="url" lay-verify="required" placeholder="请输入"
-                       autocomplete="off" class="layui-input">
-            </div>
-
-            <label class="layui-form-label">图标</label>
-            <div class="layui-input-inline">
-                <input type="text" name="icon" id="icon" lay-verify=""
-                       placeholder="请输入"
-                       autocomplete="off" class="layui-input">
-            </div>
-        </div>
-
 
         <div class="layui-form-item">
             <div class="layui-input-block">
@@ -70,44 +49,23 @@
 
 
 <script>
-    layui.use(['treeSelect', 'form', 'layer', 'table', 'upload'], function () {
-        var treeSelect = layui.treeSelect,
-            form = layui.form,
+    layui.use(['form', 'layer', 'table'], function () {
+        var form = layui.form,
             $ = layui.jquery,
-            table = layui.table,
-            upload = layui.upload,
             layer = layui.layer;
-        treeSelect.render({
-            // 选择器
-            elem: '#parent',
-            // 数据
-            data: '/system/menu/tree',
-            // 请求头
-            headers: {},
-            // 异步加载方式：get/post，默认get
-            type: 'get',
-            // 占位符
-            placeholder: '请选择',
-            //手风琴
-            accordion: true,
-            //无连线
-            showLine: true,
-            height: '160px',
-            // 点击回调
-            click: function (d) {
-                //console.log(d);
-            },
-            // 加载完成后的回调函数
-            success: function (d) {
-                //console.log(d);
-            }
-        });
 
+        role = layui.data('role').role;
+        form.val('roleForm',{
+            'id': role.id,
+            'name': role.name,
+            'desc': role.desc,
+        })
+        form.render();
 
         form.on('submit(add)', function (data) {
             console.log(data)
             $.ajax({
-                url: '/system/menu/create',
+                url: '/system/role/update',
                 method: 'post',
                 data: data.field,
                 dataType: 'json',
@@ -115,7 +73,6 @@
                 success: function (data) {
                     parent.layui.layer.closeAll();
                     parent.layui.layer.msg(data.msg)
-                    parent.layui.loadMenuTree();
                     return false;
                 },
                 error: function () {
@@ -123,7 +80,7 @@
                     return false;
                 },
                 complete: function () {
-                    parent.layui.table.reload('dept')
+                    parent.layui.table.reload('role')
                     return false;
                 }
             });
@@ -142,7 +99,6 @@
                     return '用户名不能全为数字';
                 }
             }
-            , email: [/^[a-z0-9._%-]+@([a-z0-9-]+\.)+[a-z]{2,4}$|^1[3|4|5|7|8]\d{9}$/, '邮箱格式不对']
         });
 
     });

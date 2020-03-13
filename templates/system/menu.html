@@ -3,17 +3,26 @@
 
 {% block main %}
     <div class="layui-card">
-        <div class="layui-card-header">菜单管理</div>
-        <div class="layui-card-body">
-            <table id="dept" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}" lay-filter="dept">
-            </table>
+    <div class="layui-card-header">菜单管理</div>
+    <div class="layui-card-body">
+        <div class="layui-row">
+            <div class="layui-col-md2">
+                <div id="menuTree" class="layui-tree layui-tree-line"
+                     style="width: 200px; min-height: 200px; margin: 10px 30px; padding: 10px; border: 1px solid lightgray"></div>
+            </div>
+            <div class="layui-col-md10">
+                <table id="dept" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}"
+                       lay-filter="dept">
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}
 {% block myjs %}
     <script>
-        layui.use(['element', 'jquery', 'table', 'form'], function () {
+        layui.use(['element', 'jquery', 'table', 'form', 'tree'], function () {
             var $ = layui.$,
+                tree1 = layui.tree,
                 tree = layui.treeSelect,
                 element = layui.element,
                 table = layui.table;
@@ -96,8 +105,9 @@
                     case 'delete':
                         layer.confirm('真的删除行么', function (index) {
                             obj.del();
-                            deleteDepts([data.id], index)
+                            deleteDepts([data.id], index);
                             layer.close(index);
+                            layui.loadMenuTree();
                         });
                         break;
                     case 'edit':
@@ -112,7 +122,30 @@
                         break;
                 }
             });
+
+            layui.loadMenuTree = function() {
+                $.ajax({
+                    url: '/system/menu/tree',
+                    method: 'get',
+                    success: function (res) {
+                        console.log(res)
+                        var inst1 = tree1.render({
+                            elem: '#menuTree'  //绑定元素
+                            , showCheckbox: true
+                            , data: res
+                        });
+                    }
+                })
+            }
+
+            layui.loadMenuTree();
         });
+
+        function test(){
+            console.log('run')
+        }
+
+
     </script>
 
     <script type="text/html" id="toolbar">
@@ -135,4 +168,3 @@
         </div>
     </script>
 {% endblock %}
-
