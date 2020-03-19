@@ -14,8 +14,8 @@
         <div class="layui-logo layui-word-aux">PittaOps</div>
         <ul class="layui-nav layui-layout-left">
             <li class="layui-nav-item"><a href="">控制台</a></li>
-            <li class="layui-nav-item"><a href="">系统管理</a></li>
-            <li class="layui-nav-item"><a href="">CMDB</a></li>
+            <li class="layui-nav-item"><a href="/system/index.page">系统管理</a></li>
+            <li class="layui-nav-item"><a href="/cmdb/view">CMDB</a></li>
             <li class="layui-nav-item">
                 <a href="javascript:;">监控系统</a>
                 <dl class="layui-nav-child">
@@ -36,7 +36,7 @@
                     <dd><a href="">安全设置</a></dd>
                 </dl>
             </li>
-            <li class="layui-nav-item"><a href="">退了</a></li>
+            <li class="layui-nav-item"><a href="/logout">退了</a></li>
         </ul>
     </div>
 
@@ -44,22 +44,21 @@
         <div class="layui-side-scroll">
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree" lay-filter="test" lay-shrink="all">
-                <li class="layui-nav-item layui-nav-itemed">
-                    <a href="javascript:;">权限管理</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="/system/dept">组织架构</a></dd>
-                        <dd><a href="/system/menu">菜单管理</a></dd>
-                        <dd><a href="/system/role">角色管理</a></dd>
-                        <dd><a href="/system/user">用户管理</a></dd>
-                    </dl>
-                </li>
-                <li class="layui-nav-item">
-                    <a href="javascript:;">系统设置</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">邮箱设置</a></dd>
-                        <dd><a href="javascript:;">个人资料</a></dd>
-                    </dl>
-                </li>
+                {% for menu in menus %}
+                    {% if menu.name == '系统管理' %}
+                        {% for menu2 in menu.children %}
+                            <li class="layui-nav-item">
+                                <a href="javascript:;">{{ menu2.name }}</a>
+                                <dl class="layui-nav-child">
+                                    {% for menu3 in menu2.children %}
+                                            <dd><a href="{{ menu3.url }}">{{ menu3.name }}</a></dd>
+                                    {% endfor %}
+                                </dl>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+
             </ul>
         </div>
     </div>
@@ -77,9 +76,9 @@
 <script src="{% static 'layui/layui.js' %}"></script>
 <script>
     //JavaScript代码区域
-    layui.use(['element','jquery'], function () {
+    layui.use(['element', 'jquery'], function () {
         var element = layui.element,
-        $ = layui.$;
+            $ = layui.$;
 
         $(".layui-nav-tree a").click(function (e) {
             e.preventDefault();

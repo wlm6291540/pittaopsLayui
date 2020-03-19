@@ -1,0 +1,146 @@
+{% extends 'tpl/template.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="layui-card">
+        <div class="layui-card-header">应用管理</div>
+        <div class="layui-card-body">
+            <table id="app" lay-hide lay-skin="line" lay-size="lg"
+                   lay-filter="app">
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script>
+        layui.use(['element', 'jquery', 'table', 'form', 'tree'], function () {
+            var $ = layui.$,
+                tree1 = layui.tree,
+                tree = layui.treeSelect,
+                element = layui.element,
+                table = layui.table;
+            //第一个实例
+            table.render({
+                id: 'app'
+                , elem: '#app'
+                , toolbar: '#topbar'
+                , url: '/cmdb/app/list' //数据接口
+                , page: true //开启分页
+                , limit: 10
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'id', title: 'ID', sort: true}
+                    , {field: 'cmd', title: '命令',}
+                    , {field: 'name', title: '应用名',}
+                    , {field: 'config', title: '配置文件',}
+                    , {field: 'port', title: '端口', sort: true}
+                    , {field: 'log', title: '日志文件',}
+                    , {field: 'start', title: '启动命令', sort: true}
+                    , {field: 'stop', title: '停止命令', sort: true}
+                    , {field: 'restart', title: '重启命令', sort: true}
+                    , {field: 'add_time', title: '添加时间', sort: true}
+                    , {field: 'adder__username', title: '添加人',}
+                    , {title: '操作', fixed: 'right', align: 'center', toolbar: '#toolbar'}
+                ]]
+                , page: true
+            });
+
+            function deleteServer(ids, index) {
+                $.ajax({
+                    url: '/cmdb/app/delete',
+                    method: 'post',
+                    data: {'ids': JSON.stringify(ids)},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg);
+                            layer.close(index);
+                            table.reload('server');
+                        } else {
+                            layer.msg(data.msg)
+                        }
+                    },
+                    error: function () {
+                        layer.msg('系统内部错误')
+                        layer.close(index)
+                    }
+                })
+            }
+
+            table.on('toolbar(app)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'addApp':
+                        var data = checkStatus.data;
+                        layer.open({
+                            id: 'addApp',
+                            title: '添加应用',
+                            area: ['100%', '100%'],
+                            type: 2,
+                            content: "{% static 'module/forms/app/addForm.html' %}",
+                        });
+                        break;
+                    case 'deleteApp':
+                        var data = checkStatus.data;
+                        var ids = []
+                        $(data).each(function (index, item) {
+                            ids.push(item.id)
+                        })
+                        layer.confirm('确认删除?', function (index) {
+                            if (index = layer.index) {
+                                deleteServer(ids, index)
+                            }
+                        })
+                        break;
+                }
+            });
+
+            table.on('tool(app)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+                switch (obj.event) {
+                    case 'delete':
+                        layer.confirm('真的删除行么', function (index) {
+                            obj.del();
+                            deleteServer([data.id], index);
+                            layer.close(index);
+                        });
+                        break;
+                    case 'edit':
+                        layui.data('app', {'key': 'app', 'value': data})
+                        layer.open({
+                            id: 'editApp',
+                            title: '修改应用',
+                            area: ['430px', '420px'],
+                            type: 2,
+                            content: "{% static 'module/forms/app/editForm.html' %}"
+                        });
+                        break;
+                }
+            });
+
+        });
+
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </a>
+        <a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-danger" lay-event="delete">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </script>
+
+    <script type="text/html" id="topbar">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn layui-btn-sm" lay-event="addApp">
+                <i class="layui-icon">&#xe654; 添加应用 </i>
+            </button>
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteApp">
+                <i class="layui-icon">&#xe640; 批量删除</i>
+            </button>
+        </div>
+    </script>
+{% endblock %}

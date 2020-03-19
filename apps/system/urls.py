@@ -13,13 +13,13 @@ from system.view_perm import (
     PermissionMainView)
 
 from system.views_role import (
-    RoleMainView, RoleCreateView, RoleListView, RoleDeleteView, RoleUpdateView, RoleBindUserView)
+    RoleMainView, RoleCreateView, RoleListView, RoleDeleteView, RoleUpdateView, RoleBindUserView, RoleBindMenuView)
 
 system_urls = []
 
 # 部门url
 dept_url = [
-    path('system/dept', DepartmentMainView.as_view(), name='dept main'),
+    path('system/dept.page', DepartmentMainView.as_view(), name='dept main'),
     path('system/dept/list', DepartmentListView.as_view(), name='dept list'),
     path('system/dept/tree', DepartmentTreeView.as_view(), name='dept tree'),
     path('system/dept/create', DepartmentCreateView.as_view(), name='dept create'),
@@ -30,18 +30,19 @@ path('system/dept/binduser', DepartmentBindUserView.as_view(), name='dept bind u
 
 # 角色url
 role_url = [
-    path('system/role', RoleMainView.as_view(), name='role main'),
+    path('system/role.page', RoleMainView.as_view(), name='role main'),
     path('system/role/list', RoleListView.as_view(), name='role list'),
     path('system/role/create', RoleCreateView.as_view(), name='role create'),
     path('system/role/delete', RoleDeleteView.as_view(), name='role delete'),
     path('system/role/update', RoleUpdateView.as_view(), name='role update'),
     # path('system/user/active', UserActiveView.as_view(), name='user active'),
-    path('system/role/binduser', RoleBindUserView.as_view(), name='role bind user')
+    path('system/role/binduser', RoleBindUserView.as_view(), name='role bind user'),
+    path('system/role/bindmenu', RoleBindMenuView.as_view(), name='role bind menu')
 ]
 
 # 用户url
 user_url = [
-    path('system/user', UserMainView.as_view(), name='user main'),
+    path('system/user.page', UserMainView.as_view(), name='user main'),
     path('system/user/list', UserListView.as_view(), name='user list'),
     path('system/user/create', UserCreateView.as_view(), name='user create'),
     path('system/user/delete', UserDeleteView.as_view(), name='user delete'),
@@ -51,12 +52,12 @@ user_url = [
 
 # 权限url
 perm_url = [
-    path('system/perm', PermissionMainView.as_view(), name='perm main')
+    path('system/perm.page', PermissionMainView.as_view(), name='perm main')
 ]
 
 # 菜单url
 menu_url = [
-    path('system/menu', MenuMainView.as_view(), name='menu main'),
+    path('system/menu.page', MenuMainView.as_view(), name='menu main'),
     path('system/menu/list', MenuListView.as_view(), name='menu list'),
     path('system/menu/create', MenuCreateView.as_view(), name='menu create'),
     path('system/menu/delete', MenuDeleteView.as_view(), name='menu delete'),

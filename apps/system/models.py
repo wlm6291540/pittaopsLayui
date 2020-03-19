@@ -24,7 +24,8 @@ class Menu(models.Model):
     菜单
     """
     name = models.CharField(max_length=30, unique=True, verbose_name="菜单名")
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="父菜单")
+    parent = models.ForeignKey("self", related_name='children', related_query_name='children', null=True, blank=True,
+                               on_delete=models.SET_NULL, verbose_name="父菜单")
     icon = models.CharField(max_length=50, null=True, blank=True, verbose_name="图标")
     code = models.CharField(max_length=50, null=True, blank=True, verbose_name="编码")
     url = models.CharField(max_length=128, unique=True, null=True, blank=True)

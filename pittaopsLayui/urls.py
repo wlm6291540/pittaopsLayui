@@ -20,13 +20,18 @@ from django.urls import path
 
 from system.urls import system_urls
 from system.views import MainPageView
-from system.views_user import ImageUploadView
+from system.views_user import ImageUploadView, LoginView, LogoutView
+
+from cmdb.urls import cmdb_urls
 
 urlpatterns = [
+    path('system/index.page', MainPageView.as_view(), name='index page'),
     path('', MainPageView.as_view(), name='main page'),
-    path('index', MainPageView.as_view(), name='index page'),
+    path('login', LoginView.as_view(), name='login action'),
+    path('logout', LogoutView.as_view(), name='logout action'),
     path('upload', ImageUploadView.as_view(), name='upload'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns.extend(system_urls)
+urlpatterns.extend(cmdb_urls)

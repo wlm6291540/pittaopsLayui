@@ -1,0 +1,139 @@
+{% extends 'tpl/template.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="layui-card">
+        <div class="layui-card-header">IDC管理</div>
+        <div class="layui-card-body">
+            <table id="idc" lay-hide lay-skin="line" lay-size="lg"
+                   lay-filter="idc">
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script>
+        layui.use(['element', 'jquery', 'table', 'form', 'tree'], function () {
+            var $ = layui.$,
+                tree1 = layui.tree,
+                tree = layui.treeSelect,
+                element = layui.element,
+                table = layui.table;
+            //第一个实例
+            table.render({
+                id: 'idc'
+                , elem: '#idc'
+                , toolbar: '#topbar'
+                , url: '/cmdb/idc/list' //数据接口
+                , page: true //开启分页
+                , limit: 10
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'id', title: 'ID', sort: true}
+                    , {field: 'name', title: '机房名',}
+                    , {field: 'area', title: '区域',}
+                    , {field: 'desc', title: '描述', sort: true}
+                    , {title: '操作', fixed: 'right', align: 'center', toolbar: '#toolbar'}
+                ]]
+                , page: true
+            });
+
+            function deleteIdcs(ids, index) {
+                $.ajax({
+                    url: '/cmdb/idc/delete',
+                    method: 'post',
+                    data: {'ids': JSON.stringify(ids)},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg);
+                            layer.close(index);
+                            table.reload('idc');
+                        } else {
+                            layer.msg(data.msg)
+                        }
+                    },
+                    error: function () {
+                        layer.msg('系统内部错误')
+                        layer.close(index)
+                    }
+                })
+            }
+
+            table.on('toolbar(idc)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'addIdc':
+                        var data = checkStatus.data;
+                        layer.open({
+                            id: 'addIdc',
+                            title: '添加IDC',
+                            area: ['430px', '320px'],
+                            type: 2,
+                            content: "{% static 'module/forms/cmdb/addIdcForm.html' %}",
+                        });
+                        break;
+                    case 'deleteIdc':
+                        var data = checkStatus.data;
+                        var ids = []
+                        $(data).each(function (index, item) {
+                            ids.push(item.id)
+                        })
+                        layer.confirm('确认删除?', function (index) {
+                            if (index = layer.index) {
+                                deleteIdcs(ids, index)
+                            }
+                        })
+                        break;
+                }
+            });
+
+            table.on('tool(idc)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+                switch (obj.event) {
+                    case 'delete':
+                        layer.confirm('真的删除行么', function (index) {
+                            obj.del();
+                            deleteIdcs([data.id], index);
+                            layer.close(index);
+                        });
+                        break;
+                    case 'edit':
+                        layui.data('idc', {'key': 'idc', 'value': data})
+                        layer.open({
+                            id: 'editIdc',
+                            title: '修改菜单',
+                            area: ['430px', '320px'],
+                            type: 2,
+                            content: "{% static 'module/forms/cmdb/editIdcForm.html' %}"
+                        });
+                        break;
+                }
+            });
+
+        });
+
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </a>
+        <a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-danger" lay-event="delete">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </script>
+
+    <script type="text/html" id="topbar">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn layui-btn-sm" lay-event="addIdc">
+                <i class="layui-icon">&#xe654; 添加IDC </i>
+            </button>
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteIdc">
+                <i class="layui-icon">&#xe640; 批量删除</i>
+            </button>
+        </div>
+    </script>
+{% endblock %}

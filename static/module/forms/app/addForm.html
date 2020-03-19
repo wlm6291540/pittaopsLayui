@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <style>
+        body {
+            width: inherit;
+            height: inherit;
+            padding-top: 40px;
+        }
+
+        .layui-form-item .layui-form-checkbox[lay-skin=primary] {
+            margin-top: 0px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <form class="layui-form" lay-filter="idcForm" method="post">
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">名称<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input type="text" id="name" name="name" lay-filter="name" placeholder="请输入" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">路径<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input name="path" id="path" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">端口<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input name="port" id="port" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">命令<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input name="cmd" id="cmd" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">配置文件<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input name="config" id="config" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">日志文件<span style="color: #FF5722">&nbsp;&nbsp;*</span></label>
+            <div class="layui-input-block">
+                <input name="log" id="log" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">启动</label>
+            <div class="layui-input-block">
+                <input name="start" id="start" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">停止</label>
+            <div class="layui-input-block">
+                <input name="stop" id="stop" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width: 610px">
+            <label class="layui-form-label">重启</label>
+            <div class="layui-input-block">
+                <input name="restart" id="restart" class="layui-input" placeholder="请输入">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left: 270px">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="add">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="../../../layui/layui.js"></script>
+<script src="../../../treeSelect/common.js"></script>
+
+
+<script>
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form,
+            $ = layui.jquery;
+
+
+        form.on('submit(add)', function (data) {
+            $.ajax({
+                url: '/cmdb/label/create',
+                method: 'post',
+                data: data.field,
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    parent.layui.layer.closeAll();
+                    parent.layui.layer.msg(data.msg)
+                    return false;
+                },
+                error: function () {
+                    parent.layui.layer.msg('内部错误')
+                    return false;
+                },
+                complete: function () {
+                    parent.layui.table.reload('label')
+                    return false;
+                }
+            });
+        })
+
+
+        form.verify({
+            name: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '标题不能全为数字';
+                }
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.db.models.functions import Lower, Concat
 from django.forms import model_to_dict, modelformset_factory
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import CreateView, TemplateView, DeleteView, UpdateView
 
@@ -135,21 +136,56 @@ class RoleBindUserView(View):
         return JsonResponse(ret)
 
 
-class RoleMenuTreeView(View):
+class RoleBindMenuView(View):
     def get(self, request):
-        code = 0
-        msg = '获取成功'
-        result = []
-        param = request.GET
-        roleid = param.get('roleid', None)
-        select = param.get('select', None)
-        fields = ['id', 'name', 'parent']
-        for item in Menu.objects.filter(parent=None):
-            second = []
-            for item2 in Menu.objects.filter(parent=item):
-                tmp = list(Menu.objects.filter(parent=item2).values(*fields, title=Lower('name')))
-                data = model_to_dict(item2)
-                second.append({**data, 'title': data['name'], 'children': tmp})
-            tmp = model_to_dict(item)
-            result.append({**tmp, 'title': tmp['name'], 'children': second})
+        try:
+            role = Role.objects.get(id=int(request.GET.get('id')))
+            menus = list(map(lambda x: x['id'], role.permissions.values('id')))
+            result = to_tree(None, Menu, 1, menus=menus)
+        except ValueError as e:
+            result = []
         return JsonResponse(result, safe=False)
+
+    def post(self, request):
+        code = 0
+        msg = '授权成功'
+        ids = request.POST.get('ids', None)
+        if ids:
+            role = Role.objects.get(id=request.POST.get('id'))
+            ids = json.loads(ids)
+            menus = Menu.objects.filter(id__in=ids)
+            role.permissions.clear()
+            role.permissions.set(menus)
+            role.save()
+
+        else:
+            code = 1
+            msg = '参数错误'
+        ret = dict(code=code, msg=msg)
+        return JsonResponse(ret)
+
+
+def to_tree(parent, model, level=1, fields=['id'], menus=[]):
+    result = []
+    for item in model.objects.filter(parent=parent):
+        data = model_to_dict(item, fields=fields)
+        data['label'] = item.name
+        if level > 4:
+            break
+        elif level < 4:
+            tmp = to_tree(item, model, level + 1, menus=menus)
+            if len(tmp) == 0 and data['id'] in menus:
+                data['checked'] = 'true'
+            data['children'] = tmp
+        else:
+            tmp = []
+            for item2 in model.objects.filter(parent=item).values(*fields, label=Lower('name')):
+                print('run')
+                if item2['id'] in menus:
+                    item2['checked'] = 'true'
+                tmp.append(item2)
+            if data['id'] in menus:
+                data['checked'] = 'true'
+            data['children'] = tmp
+        result.append(data)
+    return result

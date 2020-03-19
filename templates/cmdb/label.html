@@ -1,0 +1,136 @@
+{% extends 'tpl/template.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="layui-card">
+        <div class="layui-card-header">标签管理</div>
+        <div class="layui-card-body">
+            <table id="label" lay-hide lay-skin="line" lay-size="lg"
+                   lay-filter="label">
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script>
+        layui.use(['element', 'jquery', 'table', 'form', 'tree'], function () {
+            var $ = layui.$,
+                tree = layui.tree,
+                table = layui.table;
+            //第一个实例
+            table.render({
+                id: 'label'
+                , elem: '#label'
+                , toolbar: '#topbar'
+                , url: '/cmdb/label/list' //数据接口
+                , page: true //开启分页
+                , limit: 10
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'id', title: 'ID', sort: true}
+                    , {field: 'name', title: '标签',}
+                    , {field: 'desc', title: '备注',}
+                    , {title: '操作', fixed: 'right', align: 'center', toolbar: '#toolbar'}
+                ]]
+                , page: true
+            });
+
+            function deleteServer(ids, index) {
+                $.ajax({
+                    url: '/cmdb/label/delete',
+                    method: 'post',
+                    data: {'ids': JSON.stringify(ids)},
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg);
+                            layer.close(index);
+                            table.reload('label');
+                        } else {
+                            layer.msg(data.msg)
+                        }
+                    },
+                    error: function () {
+                        layer.msg('系统内部错误')
+                        layer.close(index)
+                    }
+                })
+            }
+
+            table.on('toolbar(label)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'addLabel':
+                        var data = checkStatus.data;
+                        layer.open({
+                            id: 'addLabel',
+                            title: '添加标签',
+                            area: ['430px', '280px'],
+                            type: 2,
+                            content: "{% static 'module/forms/label/addForm.html' %}",
+                        });
+                        break;
+                    case 'deleteLabel':
+                        var data = checkStatus.data;
+                        var ids = []
+                        $(data).each(function (index, item) {
+                            ids.push(item.id)
+                        })
+                        layer.confirm('确认删除?', function (index) {
+                            if (index = layer.index) {
+                                deleteServer(ids, index)
+                            }
+                        })
+                        break;
+                }
+            });
+
+            table.on('tool(label)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+                switch (obj.event) {
+                    case 'delete':
+                        layer.confirm('真的删除行么', function (index) {
+                            obj.del();
+                            deleteServer([data.id], index);
+                            layer.close(index);
+                        });
+                        break;
+                    case 'edit':
+                        layui.data('label', {'key': 'label', 'value': data})
+                        layer.open({
+                            id: 'editLabel',
+                            title: '修改标签',
+                            area: ['430px', '280px'],
+                            type: 2,
+                            content: "{% static 'module/forms/label/editForm.html' %}"
+                        });
+                        break;
+                }
+            });
+
+        });
+
+    </script>
+
+    <script type="text/html" id="toolbar">
+        <a class="layui-btn layui-btn-radius layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </a>
+        <a class="layui-btn layui-btn-radius layui-btn-xs layui-btn-danger" lay-event="delete">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </script>
+
+    <script type="text/html" id="topbar">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn layui-btn-sm" lay-event="addLabel">
+                <i class="layui-icon">&#xe654; 添加标签 </i>
+            </button>
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteLabel">
+                <i class="layui-icon">&#xe640; 批量删除</i>
+            </button>
+        </div>
+    </script>
+{% endblock %}

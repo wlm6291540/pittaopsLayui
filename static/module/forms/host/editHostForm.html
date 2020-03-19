@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <style>
+        body {
+            width: inherit;
+            height: inherit;
+            padding-top: 40px;
+        }
+
+        .layui-form-item .layui-form-checkbox[lay-skin=primary] {
+            margin-top: 0px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <form class="layui-form layui-form-pane" lay-filter="serverForm" method="post">
+        <input type="hidden" id="id" name="id">
+        <div class="layui-form-item">
+            <label class="layui-form-label">主机名</label>
+            <div class="layui-input-inline">
+                <input type="text" id="hostname" name="hostname" lay-filter="required" placeholder="请输入"
+                       class="layui-input">
+            </div>
+
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-inline">
+                <select name="owner" id="owner" lay-search="">
+                    <option value=""></option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">公网IP</label>
+            <div class="layui-input-inline">
+                <input type="text" name="public_ip" id="public_ip" placeholder="请输入"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label">私网IP</label>
+            <div class="layui-input-inline">
+                <input type="text" name="private_ip" id="private_ip" lay-filter="required" placeholder="请输入"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">服务器</label>
+            <div class="layui-input-inline">
+                <select type="text" name="server" id="server" lay-search="">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-inline">
+                <select name="type" id="type" >
+                    <option value=""></option>
+                    <option value="1">云服务器</option>
+                    <option value="2">虚拟机</option>
+                </select>
+            </div>
+            <label class="layui-form-label">操作系统</label>
+            <div class="layui-input-inline">
+                <select name="os" id="os" lay-search="">
+                    <option value=""></option>
+                    <option value="1">Linux</option>
+                    <option value="2">Windows</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">到期时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="expire" id="expire" class="layui-input" placeholder="请选择时间">
+            </div>
+
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="status" id="status">
+                    <option value=""></option>
+                    <option value="1">运行中</option>
+                    <option value="2">已停止</option>
+                    <option value="3">已删除</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组</label>
+            <div class="layui-input-inline">
+                <select name="group" id="group">
+                    <option value=""></option>
+                </select>
+            </div>
+            <label class="layui-form-label">标签</label>
+            <div class="layui-input-inline">
+                <select name="label" id="label">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left: 205px">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="add">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="../../../layui/layui.js"></script>
+<script src="../../../treeSelect/common.js"></script>
+
+
+<script>
+    layui.use(['form', 'layer', 'table', 'upload', 'laydate'], function () {
+        var treeSelect = layui.treeSelect,
+            form = layui.form,
+            laydate = layui.laydate,
+            $ = layui.jquery;
+        let host = layui.data('host').host;
+        laydate.render({elem: '#expire', value: host.expire, format: 'yyyy-MM-ddTHH:mm:ss'})
+
+
+        $.get('/cmdb/server/list', {}, function (res) {
+            $(res.data).each(function (index, item) {
+                if (host.server == item.id) {
+                    $('#server').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                } else{
+                    $('#server').append('<option value="' + item.id + '">' + item.name + '</option>')
+                }
+                form.render('select')
+            })
+        });
+
+        $.get('/system/user/list', {}, function (res) {
+            $(res.data).each(function (index, item) {
+                if (host.owner == item.id) {
+                    $('#owner').append('<option value="' + item.id + '" selected>' + item.username + '</option>')
+                } else{
+                    $('#owner').append('<option value="' + item.id + '">' + item.username + '</option>')
+                }
+                form.render('select')
+            })
+        });
+
+        $.get('/cmdb/group/list', {}, function (res) {
+            $(res.data).each(function (index, item) {
+                $('#group').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                form.render('select')
+            })
+        });
+
+        $.get('/cmdb/label/list', {}, function (res) {
+            $(res.data).each(function (index, item) {
+                $('#label').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                form.render('select')
+            })
+        });
+
+        form.val('serverForm', {
+            'id': host.id,
+            'hostname': host.hostname,
+            'public_ip': host.public_ip,
+            'private_ip': host.private_ip,
+            'server': host.server,
+            'owner': host.owner,
+            'os': host.os,
+            'type': host.type,
+            'group': host.group,
+            'label': host.label,
+            'status': host.status,
+            'expire': host.expire,
+        });
+        form.render();
+
+
+        form.on('submit(add)', function (data) {
+            $.ajax({
+                url: '/cmdb/host/update',
+                method: 'post',
+                data: data.field,
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    parent.layui.layer.closeAll();
+                    parent.layui.layer.msg(data.msg)
+                    return false;
+                },
+                error: function () {
+                    parent.layui.layer.msg('内部错误')
+                    return false;
+                },
+                complete: function () {
+                    parent.layui.table.reload('host')
+                    return false;
+                }
+            });
+        })
+
+    });
+</script>
+
+</body>
+</html>

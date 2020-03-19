@@ -7,10 +7,11 @@ import re
 
 from PIL import Image
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.hashers import make_password
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 from django.db.models import Q
@@ -22,6 +23,31 @@ from utils.JsonEncoder import DatetimeJsonEncoder
 
 # image location
 User = get_user_model()
+
+
+class LoginPageView(TemplateView):
+    template_name = 'login.html'
+
+
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'login.html', )
+
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse(dict(code=0, msg='登录成功'))
+        else:
+            return JsonResponse(dict(code=1, msg='用户名或密码错误'))
+
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return HttpResponseRedirect("login")
 
 
 class UserMainView(TemplateView):

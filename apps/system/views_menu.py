@@ -56,6 +56,7 @@ class MenuTreeView(View):
         msg = '获取成功'
         result = []
         fields = ['id', 'name', 'parent']
+        top = Menu.objects.get(id=1)
         for item in Menu.objects.filter(parent=None):
             second = []
             for item2 in Menu.objects.filter(parent=item):
