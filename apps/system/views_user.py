@@ -18,7 +18,7 @@ from django.db.models import Q
 
 # Create your views here.
 from system.forms import UserCreateForm, UserUpdateForm
-from system.models import Department
+from system.models import Department, LoginLog
 from utils.JsonEncoder import DatetimeJsonEncoder
 
 # image location
@@ -39,6 +39,12 @@ class LoginView(View):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
+            loginLog = LoginLog()
+            loginLog.user = user
+            loginLog.type = 'WEB'
+            loginLog.status = '成功'
+            loginLog.ip = request.META.get("REMOTE_ADDR")
+            loginLog.save()
             return JsonResponse(dict(code=0, msg='登录成功'))
         else:
             return JsonResponse(dict(code=1, msg='用户名或密码错误'))

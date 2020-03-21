@@ -79,3 +79,16 @@ class RoleForm(forms.ModelForm):
         error_messages = {
             "name": {"required": "角色名不能为空", 'unique': '角色名重复'},
         }
+
+
+
+class LoginLogUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Menu
+        fields = [
+            'id', 'name', 'url', 'code', 'icon', 'parent'
+        ]
+
+        error_messages = {
+            "name": {"required": "菜单名不能为空", 'unique': '菜单名重复'},
+        }

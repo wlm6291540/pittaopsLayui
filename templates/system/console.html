@@ -1,0 +1,121 @@
+{% extends 'tpl/template.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="layui-card" style="box-shadow: none">
+    <div class="layui-card-header">控制台</div>
+    <div class="layui-card-body" id="console-body">
+
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md4">
+                <div class="layui-card">
+                    <div class="layui-card-header">用户总数
+                        <span class="layui-badge layui-bg-blue pull-right">Users</span>
+                    </div>
+                    <div class="layui-card-body">
+                        <a style="color: #5FB878"><h1>{{ users }}</h1></a>
+                        <p>All Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md4">
+                <div class="layui-card">
+                    <div class="layui-card-header">主机总数<span class="layui-badge layui-bg-blue pull-right">Hosts</span>
+                    </div>
+                    <div class="layui-card-body">
+                        <a style="color: #5FB878"><h1>{{ hosts }}</h1></a>
+                        <p>All Hosts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md4">
+                <div class="layui-card">
+                    <div class="layui-card-header">应用总数<span
+                            class="layui-badge layui-bg-blue pull-right">Application</span></div>
+                    <div class="layui-card-body">
+                        <a style="color: #5FB878"><h1>{{ apps }}</h1></a>
+                        <p>All Apps</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-card">
+                    <div class="layui-card-header">月内登录总览<span
+                            class="layui-badge layui-bg-blue pull-right">Application</span></div>
+                    <div class="layui-card-body">
+                        <div id="charts" style="height: 200px"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">最近登录</div>
+                        <div class="layui-card-body">
+                            <ul class="layui-timeline">
+                                {% for log in logs %}
+                                    <li class="layui-timeline-item">
+                                        <i class="layui-icon layui-timeline-axis"></i>
+                                        <div class="layui-timeline-content layui-text">
+                                            <h3 class="layui-timeline-title">{{ log.login_time }}</h3>
+                                            <p>
+                                                <span>用户: </span><i>{{ log.user.username }}</i> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <span>IP: </span><i>{{ log.ip }}</i>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <span>状态: </span> <span
+                                                    class="layui-badge layui-bg-green"><i>{{ log.status }}</i></span>
+                                            </p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+                            <a href="/system/log/login/view" class="layui-icon layui-icon-more"
+                               style="margin-left: 95%;"></a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="layui-col-md4">
+
+                </div>
+                <div class="layui-col-md4">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('charts'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            legend: {
+                data: ['日期']
+            },
+            xAxis: {
+                data: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+            },
+            yAxis: {},
+            series: [{
+                name: '登录次数',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+{% endblock %}
+

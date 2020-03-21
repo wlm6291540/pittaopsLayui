@@ -13,7 +13,6 @@
     <div class="layui-header">
         <div class="layui-logo layui-word-aux">PittaOps</div>
         <ul class="layui-nav layui-layout-left">
-            <li class="layui-nav-item"><a href="">控制台</a></li>
             <li class="layui-nav-item"><a href="/system/index.page">系统管理</a></li>
             <li class="layui-nav-item"><a href="/cmdb/view">CMDB</a></li>
             <li class="layui-nav-item">
@@ -44,6 +43,7 @@
         <div class="layui-side-scroll">
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree" lay-filter="test" lay-shrink="all">
+                <li class="layui-nav-item"><a href="/system/console/view">控制台</a></li>
                 {% for menu in menus %}
                     {% if menu.name == '系统管理' %}
                         {% for menu2 in menu.children %}
@@ -51,7 +51,7 @@
                                 <a href="javascript:;">{{ menu2.name }}</a>
                                 <dl class="layui-nav-child">
                                     {% for menu3 in menu2.children %}
-                                            <dd><a href="{{ menu3.url }}">{{ menu3.name }}</a></dd>
+                                        <dd><a href="{{ menu3.url }}">{{ menu3.name }}</a></dd>
                                     {% endfor %}
                                 </dl>
                             </li>
@@ -84,7 +84,19 @@
             e.preventDefault();
             addr = $(e.target).attr('href');
             $('#main').attr('src', addr)
+            layui.data('url', {'key': 'href', 'value': addr})
         })
+
+
+
+        let href = layui.data('url').href;
+        let menu = $('a[href="' + href + '"]')
+        menu.click();
+        let itemed = $(menu).parent();
+        if ( $(itemed).length > 0 && $(itemed)[0].tagName == "DD"){
+            $(menu).parent().attr('class', 'layui-this');
+            $(menu).parent().parent().parent().attr('class', 'layui-nav-item layui-nav-itemed')
+        }
     });
 </script>
 </body>

@@ -13,7 +13,6 @@
     <div class="layui-header">
         <div class="layui-logo layui-word-aux">PittaOps</div>
         <ul class="layui-nav layui-layout-left">
-            <li class="layui-nav-item"><a href="">控制台</a></li>
             <li class="layui-nav-item"><a href="/system/index.page">系统管理</a></li>
             <li class="layui-nav-item"><a href="/cmdb/view">CMDB</a></li>
             <li class="layui-nav-item">
@@ -51,7 +50,7 @@
                                 <a href="javascript:;">{{ menu2.name }}</a>
                                 <dl class="layui-nav-child">
                                     {% for menu3 in menu2.children %}
-                                            <dd><a href="{{ menu3.url }}">{{ menu3.name }}</a></dd>
+                                        <dd><a href="{{ menu3.url }}">{{ menu3.name }}</a></dd>
                                     {% endfor %}
                                 </dl>
                             </li>
@@ -65,7 +64,8 @@
 
     <div class="layui-body">
         <!-- 内容主体区域 -->
-        <iframe id="main"></iframe>
+        <iframe id="main">
+        </iframe>
     </div>
 
     <div class="layui-footer">
@@ -84,7 +84,14 @@
             e.preventDefault();
             addr = $(e.target).attr('href');
             $('#main').attr('src', addr)
+            layui.data('url', {'key': 'href', 'value': addr})
         })
+
+        let href = layui.data('url').href;
+        let menu = $('a[href="' + href + '"]')
+        menu.click();
+        $(menu).parent().attr('class', 'layui-this');
+        $(menu).parent().parent().parent().attr('class', 'layui-nav-item layui-nav-itemed')
     });
 </script>
 </body>

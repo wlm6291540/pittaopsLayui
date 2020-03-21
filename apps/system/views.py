@@ -5,7 +5,8 @@ from django.views.generic import TemplateView, RedirectView
 
 
 # Create your views here.
-from system.models import Menu
+from cmdb.models import Host, App
+from system.models import Menu, LoginLog, User
 
 
 class MainPageView(TemplateView):
@@ -41,3 +42,19 @@ def to_tree(parent, model, level=1, fields=['id', 'name', 'url'], menus=[]):
             data['children'] = tmp
         result.append(data)
     return result
+
+
+class ConsoleView(TemplateView):
+    template_name = 'system/console.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        logs = LoginLog.objects.order_by('-id')[0:5]
+        users = len(User.objects.all())
+        hosts = len(Host.objects.all())
+        apps = len(App.objects.all())
+        context['logs'] = logs
+        context['users'] = users
+        context['hosts'] = hosts
+        context['apps'] = apps
+        return context

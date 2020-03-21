@@ -1,0 +1,72 @@
+{% extends 'tpl/template.html' %}
+{% load static %}
+
+{% block main %}
+    <div class="layui-card">
+        <div class="layui-card-header">登录日志</div>
+        <div class="layui-card-body">
+            <table id="login" lay-hide lay-skin="line" lay-size="lg" lay-data="{id: 'idTest'}" lay-filter="login">
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block myjs %}
+    <script>
+        layui.use(['element', 'jquery', 'table', 'form'], function () {
+            var $ = layui.$,
+                tree = layui.treeSelect,
+                element = layui.element,
+                table = layui.table;
+            //第一个实例
+            table.render({
+                id: 'login'
+                , elem: '#login'
+                , toolbar: '#topbar'
+                , url: '/system/log/login/list' //数据接口
+                , page: true //开启分页
+                , limit: 10
+                , loading: true
+                , cols: [[ //表头
+                    {type: 'checkbox'}
+                    , {field: 'id', title: 'ID', sort: true}
+                    , {field: 'user__username', title: '用户', sort: true}
+                    , {field: 'type', title: '类型', sort: true}
+                    , {field: 'status', title: '状态', templet: '#statusStyle', sort: true}
+                    , {field: 'ip', title: 'IP', sort: true}
+                    , {field: 'login_time', title: '操作时间', sort: true}
+                ]]
+            });
+
+            table.on('toolbar(login)', function (obj) {
+                switch (obj.event) {
+                    case 'search':
+                        let data = $('#search').val();
+                        table.reload('login', {
+                            url: '/system/log/login/search',
+                            method: 'post',
+                            where: {'data': data}
+                        });
+                }
+            })
+        });
+    </script>
+
+
+    <script type="text/html" id="statusStyle">
+        {% verbatim %}
+        {{#  if(d.status == '成功'){ }}
+        <span style="color: #5FB878;">成功</span>
+        {{#  } else { }}
+        <span style="color: #FF5722;">失败</span>
+        {{#  } }}
+        {% endverbatim %}
+    </script>
+
+    <script type="text/html" id="topbar">
+        <input type="text" name="search" id="search" placeholder=" 输入用户名或IP搜索"
+               autocomplete="off" style="width: 200px; height: 30px; line-height: 30px">
+        <button type="button" class="layui-btn layui-btn-sm" lay-event="search">
+            <i class="layui-icon layui-icon-search">&nbsp; 搜索</i>
+        </button>
+    </script>
+{% endblock %}

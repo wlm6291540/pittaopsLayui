@@ -3,7 +3,12 @@ from django.urls import path
 from system.views_dept import (
     DepartmentMainView, DepartmentListView, DepartmentTreeView, DepartmentCreateView, DepartmentDeleteView,
     DepartmentUpdateView, DepartmentBindUserView)
-from system.views_menu import MenuMainView, MenuListView, MenuTreeView, MenuCreateView, MenuUpdateView, MenuDeleteView
+
+from system.views_log import (
+    LoginLogMainView, LoginLogListView, LoginLogSearchView)
+
+from system.views_menu import (
+    MenuMainView, MenuListView, MenuTreeView, MenuCreateView, MenuUpdateView, MenuDeleteView)
 
 from system.views_user import (
     UserMainView, UserListView, UserCreateView, UserDeleteView,
@@ -65,8 +70,16 @@ menu_url = [
     path('system/menu/tree', MenuTreeView.as_view(), name='menu tree'),
 ]
 
+# 日志url
+log_url = [
+    path('system/log/login/view', LoginLogMainView.as_view(), name='login log main'),
+    path('system/log/login/list', LoginLogListView.as_view(), name='login log list'),
+    path('system/log/login/search', LoginLogSearchView.as_view(), name='login log search'),
+]
+
 system_urls.extend(dept_url)
 system_urls.extend(role_url)
 system_urls.extend(user_url)
 system_urls.extend(perm_url)
 system_urls.extend(menu_url)
+system_urls.extend(log_url)

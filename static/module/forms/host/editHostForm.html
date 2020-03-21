@@ -66,7 +66,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">类型</label>
             <div class="layui-input-inline">
-                <select name="type" id="type" >
+                <select name="type" id="type">
                     <option value=""></option>
                     <option value="1">云服务器</option>
                     <option value="2">虚拟机</option>
@@ -143,7 +143,7 @@
             $(res.data).each(function (index, item) {
                 if (host.server == item.id) {
                     $('#server').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
-                } else{
+                } else {
                     $('#server').append('<option value="' + item.id + '">' + item.name + '</option>')
                 }
                 form.render('select')
@@ -154,7 +154,7 @@
             $(res.data).each(function (index, item) {
                 if (host.owner == item.id) {
                     $('#owner').append('<option value="' + item.id + '" selected>' + item.username + '</option>')
-                } else{
+                } else {
                     $('#owner').append('<option value="' + item.id + '">' + item.username + '</option>')
                 }
                 form.render('select')
@@ -163,14 +163,22 @@
 
         $.get('/cmdb/group/list', {}, function (res) {
             $(res.data).each(function (index, item) {
-                $('#group').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                if (host.owner == item.id) {
+                    $('#group').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                } else {
+                    $('#group').append('<option value="' + item.id + '">' + item.name + '</option>')
+                }
                 form.render('select')
             })
         });
 
         $.get('/cmdb/label/list', {}, function (res) {
             $(res.data).each(function (index, item) {
-                $('#label').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                if (host.label == item.id) {
+                    $('#label').append('<option value="' + item.id + '" selected>' + item.name + '</option>')
+                } else {
+                    $('#label').append('<option value="' + item.id + '">' + item.name + '</option>')
+                }
                 form.render('select')
             })
         });
@@ -215,7 +223,8 @@
             });
         })
 
-    });
+    })
+    ;
 </script>
 
 </body>

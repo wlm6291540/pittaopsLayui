@@ -70,7 +70,7 @@ class HostUpdateView(View):
             if request.POST.get('group', None):
                 host.group = Group.objects.get(id=int(request.POST.get('group', None)))
             if request.POST.get('label', None):
-                host.label = Label.objects.get(id=int(request.POST.get('label', None)))
+                host.label.set([Label.objects.get(id=int(request.POST.get('label', None)))])
             host.expire = form.instance.expire
             host.owner = form.instance.owner
             host.save()

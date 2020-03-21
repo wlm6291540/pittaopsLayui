@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+
 
 # Create your models here.
 
@@ -67,3 +70,13 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+
+class LoginLog(models.Model):
+    """
+    登录日志
+    """
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='登录用户')
+    type = models.CharField(max_length=64, null=False, default='登录', verbose_name='登录类型: 登录, 登出')
+    ip = models.CharField(max_length=64, null=False, blank=True, default='', verbose_name='登录ip')
+    login_time = models.DateTimeField(default=datetime.now(), verbose_name='登录时间')
+    status = models.CharField(max_length=32, null=True, default='成功', verbose_name='状态')
